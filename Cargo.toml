@@ -32,8 +32,14 @@ anyhow = "1"
 is-terminal = "0.4"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-openssl = { version = "0.10", features = ["vendored"] }
 tokio-socks = "0.5"
+
+# Vendored OpenSSL gives reqwest (native-tls) a statically linked TLS stack on
+# the Linux CI/release targets. On Windows native-tls uses schannel instead, so
+# the dep is skipped there — building OpenSSL from source needs a full MSVC env
+# plus a module-complete perl (Strawberry), which Git Bash's MSYS perl is not.
+[target.'cfg(not(target_os = "windows"))'.dependencies]
+openssl = { version = "0.10", features = ["vendored"] }
 
 [dev-dependencies]
 assert_cmd = "2"
